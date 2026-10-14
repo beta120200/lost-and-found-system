@@ -1,0 +1,8 @@
+RewriteEngine On
+
+# Let real files (if any are ever added here) be served directly.
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^ - [L]
+
+# Everything else under /api/ goes through the front controller.
+RewriteRule ^ index.php [QSA,L]

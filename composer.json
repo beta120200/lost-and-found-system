@@ -1,0 +1,10 @@
+{
+    "name": "icct/lost-and-found-system",
+    "description": "Lost and Found System — PHP/MySQL backend with Workerman-powered live updates",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": ">=7.4",
+        "workerman/workerman": "^4.1"
+    }
+}

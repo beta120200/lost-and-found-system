@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Sign Up · Lost &amp; Found Board</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="icon" href="./assets/img/logo.svg">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/app.css">
+</head>
+
+<body>
+  <div class="app" id="app">
+    <header class="site-header">
+      <div class="header-inner" id="header-inner"></div>
+    </header>
+
+    <main id="main">
+      <div class="auth-wrap">
+        <div class="auth-hero">
+          <h2 class="display">Report it. Find it. Return it.</h2>
+          <p>A community board for reporting and reuniting lost items around campus.</p>
+        </div>
+        <div class="ticket-card">
+          <div class="ticket-tabs">
+            <a class="ticket-tab" href="login.html">Log In</a>
+            <span class="ticket-tab active">Sign Up</span>
+          </div>
+          <div class="form-body">
+            <form id="signup-form">
+              <div class="field"><label>Full name</label><input type="text" id="signup-name"
+                  placeholder="Juan Dela Cruz" required></div>
+              <div class="field"><label>Email</label><input type="email" id="signup-email" placeholder="you@icct.edu.ph"
+                  required></div>
+              <div class="field"><label>Password</label><input type="password" id="signup-password"
+                  placeholder="At least 6 characters" required></div>
+              <button type="submit" class="btn">Create Account</button>
+            </form>
+            <p class="hint">New accounts are created with the standard User role, matching the role table in the system
+              design.</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="modal-root"></div>
+  <div id="toast-root"></div>
+
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/signup.js"></script>
+</body>
+
+</html>
