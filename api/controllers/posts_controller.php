@@ -115,6 +115,14 @@ function posts_show(int $id): void {
 function posts_store(): void {
     $user = require_auth();
 
+    // If the whole request exceeds post_max_size, PHP drops $_POST and
+    // $_FILES entirely — which otherwise looks like a bogus "Type must be
+    // lost or found" error.
+    if (empty($_POST) && empty($_FILES) && (int) ($_SERVER['CONTENT_LENGTH'] ?? 0) > 0) {
+        json_error('The upload is too large for the server (post_max_size is '
+            . ini_get('post_max_size') . '). Try a smaller photo.', 413);
+    }
+
     $type = $_POST['type'] ?? '';
     $itemName = trim($_POST['item_name'] ?? '');
     $description = trim($_POST['description'] ?? '');
@@ -132,8 +140,19 @@ function posts_store(): void {
     // Section 7.2: upload to ImgBB if a photo was attached and a key is
     // configured; otherwise fall back to the chosen icon (see imgbb.php).
     $imageUrl = null;
-    if (!empty($_FILES['image']['tmp_name']) && is_uploaded_file($_FILES['image']['tmp_name'])) {
-        $imageUrl = upload_to_imgbb($_FILES['image']['tmp_name']);
+    if (isset($_FILES['image']) && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE) {
+        if ($_FILES['image']['error'] !== UPLOAD_ERR_OK) {
+            json_error(upload_error_message((int) $_FILES['image']['error']), 422);
+        }
+        if (!is_uploaded_file($_FILES['image']['tmp_name'])) {
+            json_error('The photo upload was not valid. Please try again.', 400);
+        }
+        $uploadError = null;
+        $imageUrl = upload_to_imgbb($_FILES['image']['tmp_name'], $uploadError, $_FILES['image']['name'] ?? null);
+        if ($imageUrl === null && $uploadError !== null) {
+            // Fail loudly instead of silently saving the post without its photo.
+            json_error('Photo upload failed. ' . $uploadError, 502);
+        }
     }
 
     $stmt = get_db()->prepare(

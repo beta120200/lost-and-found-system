@@ -93,6 +93,17 @@ copy your API key, and put it in `.env`:
 IMGBB_API_KEY=your-key-here
 ```
 
+**Troubleshooting photo uploads (Windows / XAMPP):** if creating a post
+with a photo shows "Photo upload failed", the message says why. The usual
+causes:
+- *SSL certificate problem* — download <https://curl.se/ca/cacert.pem>,
+  save it as `api/config/cacert.pem` (or point `curl.cainfo` and
+  `openssl.cafile` in `php.ini` at it), then restart Apache.
+- *Photo too large* — raise `upload_max_filesize` and `post_max_size` in
+  `php.ini` (XAMPP defaults to 2M / 8M), then restart Apache.
+- *Key problems* — check `.env` (not `.env.example`) holds a valid
+  `IMGBB_API_KEY`, with no extra spaces.
+
 ## 4. Live updates
 
 Posts, reports, and user status changes now broadcast live to every open
