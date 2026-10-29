@@ -1,11 +1,13 @@
 <?php
+
 /**
  * Admin controller — Section 12 (Administrator Dashboard Flowchart) and
  * Table 7 (Dashboard Content). Every function here assumes require_admin()
  * has already been enforced by the router for this route.
  */
 
-function admin_dashboard(): void {
+function admin_dashboard(): void
+{
     $db = get_db();
 
     $totalUsers = (int) $db->query('SELECT COUNT(*) FROM users')->fetchColumn();
@@ -29,15 +31,20 @@ function admin_dashboard(): void {
     ]);
 }
 
-function admin_users(): void {
+function admin_users(): void
+{
     $rows = get_db()->query(
         'SELECT id, name, email, role, status, created_at FROM users ORDER BY created_at ASC'
     )->fetchAll();
 
     $users = array_map(function ($u) {
         return [
-            'id' => (int) $u['id'], 'name' => $u['name'], 'email' => $u['email'],
-            'role' => $u['role'], 'status' => $u['status'], 'created_at' => $u['created_at'],
+            'id' => (int) $u['id'],
+            'name' => $u['name'],
+            'email' => $u['email'],
+            'role' => $u['role'],
+            'status' => $u['status'],
+            'created_at' => $u['created_at'],
         ];
     }, $rows);
 
@@ -45,7 +52,8 @@ function admin_users(): void {
 }
 
 /** Toggles a user's active/disabled status. Admin accounts can't be disabled. */
-function admin_toggle_user(int $id): void {
+function admin_toggle_user(int $id): void
+{
     $db = get_db();
     $stmt = $db->prepare('SELECT * FROM users WHERE id = ?');
     $stmt->execute([$id]);
@@ -64,7 +72,8 @@ function admin_toggle_user(int $id): void {
     json_ok(['message' => "Account status updated to {$newStatus}.", 'status' => $newStatus]);
 }
 
-function admin_posts(): void {
+function admin_posts(): void
+{
     $rows = get_db()->query(
         'SELECT p.*, u.name AS owner_name FROM posts p JOIN users u ON u.id = p.user_id
          ORDER BY p.created_at DESC LIMIT 200'
@@ -73,7 +82,8 @@ function admin_posts(): void {
     json_ok(['posts' => array_map('post_row_for_output', $rows)]);
 }
 
-function admin_reports(): void {
+function admin_reports(): void
+{
     $rows = get_db()->query(
         'SELECT r.*, u.name AS reporter_name, p.id AS live_post_id
          FROM reports r
@@ -97,7 +107,8 @@ function admin_reports(): void {
     json_ok(['reports' => $reports]);
 }
 
-function admin_dismiss_report(int $id): void {
+function admin_dismiss_report(int $id): void
+{
     $db = get_db();
     $stmt = $db->prepare('SELECT * FROM reports WHERE id = ?');
     $stmt->execute([$id]);
@@ -112,7 +123,8 @@ function admin_dismiss_report(int $id): void {
 }
 
 /** Removes the reported post (if it still exists) and resolves the report. */
-function admin_remove_reported_post(int $id): void {
+function admin_remove_reported_post(int $id): void
+{
     $db = get_db();
     $stmt = $db->prepare('SELECT * FROM reports WHERE id = ?');
     $stmt->execute([$id]);
@@ -124,7 +136,15 @@ function admin_remove_reported_post(int $id): void {
     $db->beginTransaction();
     try {
         if ($report['post_id'] !== null) {
-            $db->prepare('DELETE FROM posts WHERE id = ?')->execute([$report['post_id']]);
+            $postStmt = $db->prepare('SELECT id, item_name, type FROM posts WHERE id = ?');
+            $postStmt->execute([$report['post_id']]);
+            $removedPost = $postStmt->fetch();
+
+            if ($removedPost) {
+                $db->prepare('INSERT INTO resolved_log (post_id, item_name, type) VALUES (?, ?, ?)')
+                    ->execute([$removedPost['id'], $removedPost['item_name'], $removedPost['type']]);
+                $db->prepare('DELETE FROM posts WHERE id = ?')->execute([$report['post_id']]);
+            }
         }
         $db->prepare('UPDATE reports SET status = "resolved" WHERE id = ?')->execute([$id]);
         $db->commit();

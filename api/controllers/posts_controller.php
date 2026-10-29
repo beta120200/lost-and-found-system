@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Posts controller.
  *
@@ -14,7 +15,8 @@
  * posts_resolve() PATCH  /api/posts/:id/resolve resolve + delete (Section 13 flowchart)
  */
 
-function post_row_for_output(array $row): array {
+function post_row_for_output(array $row): array
+{
     return [
         'id'             => (int) $row['id'],
         'user_id'        => (int) $row['user_id'],
@@ -25,14 +27,15 @@ function post_row_for_output(array $row): array {
         'image_url'      => $row['image_url'],
         'icon'           => $row['icon'],
         'location'       => $row['location'],
-        'date_lost_found'=> $row['date_lost_found'],
+        'date_lost_found' => $row['date_lost_found'],
         'status'         => $row['status'],
         'created_at'     => $row['created_at'],
         'days_pending'   => isset($row['days_pending']) ? (int) $row['days_pending'] : null,
     ];
 }
 
-function posts_index(): void {
+function posts_index(): void
+{
     $db = get_db();
 
     // "Still Not Found" sidebar: oldest pending posts, 30+ days old, capped at 20.
@@ -100,7 +103,8 @@ function posts_index(): void {
     json_ok(['posts' => array_map('post_row_for_output', $stmt->fetchAll())]);
 }
 
-function posts_show(int $id): void {
+function posts_show(int $id): void
+{
     $stmt = get_db()->prepare(
         'SELECT p.*, u.name AS owner_name FROM posts p JOIN users u ON u.id = p.user_id WHERE p.id = ?'
     );
@@ -112,7 +116,8 @@ function posts_show(int $id): void {
     json_ok(['post' => post_row_for_output($post)]);
 }
 
-function posts_store(): void {
+function posts_store(): void
+{
     $user = require_auth();
 
     // If the whole request exceeds post_max_size, PHP drops $_POST and
@@ -166,7 +171,8 @@ function posts_store(): void {
     posts_show($newId);
 }
 
-function posts_update(int $id): void {
+function posts_update(int $id): void
+{
     $user = require_auth();
     $data = json_body();
 
@@ -200,7 +206,8 @@ function posts_update(int $id): void {
     posts_show($id);
 }
 
-function posts_destroy(int $id): void {
+function posts_destroy(int $id): void
+{
     $user = require_auth();
 
     $stmt = get_db()->prepare('SELECT * FROM posts WHERE id = ?');
@@ -218,7 +225,8 @@ function posts_destroy(int $id): void {
     json_ok(['message' => 'Post deleted.']);
 }
 
-function posts_report(int $id): void {
+function posts_report(int $id): void
+{
     $user = require_auth();
     $data = json_body();
     $reason = trim($data['reason'] ?? '');
@@ -242,7 +250,8 @@ function posts_report(int $id): void {
     json_ok(['message' => 'Report submitted for administrator review.'], 201);
 }
 
-function posts_resolve(int $id): void {
+function posts_resolve(int $id): void
+{
     $user = require_auth();
     $data = json_body();
 
@@ -264,8 +273,8 @@ function posts_resolve(int $id): void {
     $db = get_db();
     $db->beginTransaction();
     try {
-        $db->prepare('INSERT INTO resolved_log (item_name, type) VALUES (?, ?)')
-           ->execute([$post['item_name'], $post['type']]);
+        $db->prepare('INSERT INTO resolved_log (post_id, item_name, type) VALUES (?, ?, ?)')
+            ->execute([$post['id'], $post['item_name'], $post['type']]);
         $db->prepare('DELETE FROM posts WHERE id = ?')->execute([$id]);
         $db->commit();
     } catch (Exception $e) {

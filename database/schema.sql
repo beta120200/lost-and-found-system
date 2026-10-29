@@ -81,7 +81,9 @@ CREATE TABLE IF NOT EXISTS reports (
 -- ---------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS resolved_log (
   id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  post_id     INT UNSIGNED NULL,
   item_name   VARCHAR(150) NOT NULL,
   type        ENUM('lost','found') NOT NULL,
   resolved_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+  INDEX idx_resolved_post (post_id)
 ) ENGINE=InnoDB;
