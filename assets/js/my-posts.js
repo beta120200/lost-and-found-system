@@ -1,12 +1,7 @@
-/* ---------------------------------------------------------
-   My Posts page. Loaded after api.js, common.js, modals.js.
-   No realtime.js here — only the owner can change their own posts,
-   so there's nothing for this page to live-update against.
---------------------------------------------------------- */
 window.CURRENT_PAGE = "myposts";
 
   function renderMyPosts(){
-    var main = document.getElementById("main");
+    let main = document.getElementById("main");
     main.innerHTML =
       '<div class="view-head"><div><h2 class="display">My Posts</h2><p>Reports you&rsquo;ve created, and their current status.</p></div>' +
       '<button class="btn" style="width:auto;" data-action="new-post">+ New Post</button></div>' +
@@ -21,7 +16,7 @@ window.CURRENT_PAGE = "myposts";
   }
 
   function renderMyPostsGrid(mine){
-    var grid = document.getElementById("myposts-grid");
+    let grid = document.getElementById("myposts-grid");
     if(!grid) return;
     if(mine.length === 0){
       grid.innerHTML = '<div class="empty-state"><h3>You haven&rsquo;t posted anything yet</h3><p>Create a lost or found report to get it in front of the community.</p></div>';
@@ -29,7 +24,7 @@ window.CURRENT_PAGE = "myposts";
     }
     grid.innerHTML = '<div class="grid">' + mine.map(renderMyCard).join("") + '</div>';
     grid.querySelectorAll(".tag-card").forEach(function(card){
-      var p = mine.filter(function(x){ return String(x.id) === card.getAttribute("data-id"); })[0];
+      let p = mine.filter(function(x){ return String(x.id) === card.getAttribute("data-id"); })[0];
       card.addEventListener("click", function(e){
         if(e.target.closest(".tag-foot button")) return;
         window.location.href = "post-details.html?id=" + p.id;
@@ -71,10 +66,6 @@ window.CURRENT_PAGE = "myposts";
     );
   }
 
-
-/* ---------------------------------------------------------
-   Page bootstrap
---------------------------------------------------------- */
 requireSession(["user"]).then(function(){
   renderHeader("myposts");
   renderMyPosts();

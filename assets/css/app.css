@@ -123,7 +123,6 @@
     display: none !important;
   }
 
-  /* Header — dark top bar in the style of Facebook's nav */
   .site-header {
     background: #18191A;
     color: #E4E6EB;
@@ -164,7 +163,7 @@
     cursor: pointer;
   }
 
- 
+
 
   .fb-search {
     display: flex;
@@ -406,7 +405,6 @@
     width: 100%;
   }
 
-  /* Auth view */
   .auth-wrap {
     max-width: 460px;
     margin: 20px auto 0;
@@ -597,7 +595,6 @@
     line-height: 1.5;
   }
 
-  /* Feed view */
   .view-head {
     display: flex;
     justify-content: space-between;
@@ -637,7 +634,6 @@
     color: var(--paper);
   }
 
-  /* Composer card — Facebook-style "what's on your mind" post trigger */
   .composer-card {
     max-width: 640px;
     margin: 0 auto 18px;
@@ -779,7 +775,6 @@
     color: var(--ink-soft);
   }
 
-  /* Two-column feed layout */
   .feed-layout {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 300px;
@@ -953,7 +948,6 @@
     gap: 18px;
   }
 
-  /* Feed — single-column scrolling list, Facebook-style */
   .feed-wrap {
     max-width: 640px;
     margin: 0 auto;
@@ -993,7 +987,6 @@
 
   .feed-card-head {
     width: 100%;
-    /* align-items: flex-start; */
   }
 
   .feed-icon {
@@ -1008,10 +1001,10 @@
   .feed-head-text {
     display: flex;
     flex-direction: column;
-    
+
     gap: 20px;
     min-width: 0;
-    
+
   }
 
   .feed-card-title {
@@ -1247,7 +1240,6 @@
     margin-bottom: 6px;
   }
 
-  /* Dashboard */
   .summary-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -1358,7 +1350,6 @@
     flex-wrap: wrap;
   }
 
-  /* Modal */
   .modal-backdrop {
     position: fixed;
     inset: 0;
@@ -1433,7 +1424,6 @@
     flex-shrink: 0;
   }
 
-  /* Toasts */
   #toast-root {
     position: fixed;
     bottom: 20px;
@@ -1525,10 +1515,7 @@
       font-size: 1.7rem;
     }
   }
-
-  /* Real uploaded photos (Section 7.2 / ImgBB) shown wherever an emoji
-     icon would otherwise sit — these containers are fixed-size circles,
-     so the <img> just fills them. */
+  
   .feed-icon .post-photo,
   .sidebar-icon .post-photo {
     width: 100%;
@@ -1557,7 +1544,6 @@
     background: var(--paper-2);
   }
 
-  /* Post Details / Create Post — full pages now, not modals (Section 6) */
   .page-card {
     max-width: 640px;
     margin: 0 auto;
@@ -1608,4 +1594,30 @@
     background: var(--paper);
     color: var(--ink-soft);
     font-size: 0.85rem;
+  }
+
+  .password-rules {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.85rem;
+  }
+
+  .rule-item {
+    color: #ff4d4f;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+  }
+
+  .rule-item.rule-capital {
+    font-weight: 700;
+    color: #d9363e;
+  }
+
+  .rule-success {
+    color: #52c41a;
+    font-weight: 600;
   }

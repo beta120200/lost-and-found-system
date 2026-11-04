@@ -1,16 +1,3 @@
-/* ---------------------------------------------------------
-   Shared confirmation modals — report, resolve-confirm, delete-confirm.
-   Used by post-details.html and my-posts.html, loaded after api.js and
-   common.js. (Post detail and Create/Edit Post used to live here too,
-   as modals — they're now real pages: post-details.html and
-   create-post.html, matching Section 6 of the doc.)
-
-   Each caller can set window.onPostsMutated() beforehand with whatever
-   should happen after a successful delete/resolve — a grid refresh on
-   my-posts.html, a redirect on post-details.html. These modals just
-   call it, they don't know or care which page they're on.
---------------------------------------------------------- */
-
 function confirmDeletePost(id){
   openModal(
     '<div class="modal-head"><h3>Delete post?</h3><button class="modal-close" data-action="close-modal">&times;</button></div>' +
@@ -19,7 +6,7 @@ function confirmDeletePost(id){
     function(){
       bindModalCommon();
       document.getElementById("confirm-delete").addEventListener("click", function(btnEvt){
-        var btn = document.getElementById("confirm-delete");
+        let btn = document.getElementById("confirm-delete");
         btn.disabled = true;
         api.deletePost(id).then(function(){
           closeModal();
@@ -47,7 +34,7 @@ function openResolveConfirm(id){
         toast("Post kept as pending.");
       });
       document.getElementById("resolve-yes").addEventListener("click", function(){
-        var btn = document.getElementById("resolve-yes");
+        let btn = document.getElementById("resolve-yes");
         btn.disabled = true;
         api.resolvePost(id, true).then(function(){
           closeModal();
@@ -81,9 +68,9 @@ function openReportForm(id){
     function(){
       bindModalCommon();
       document.getElementById("submit-report").addEventListener("click", function(){
-        var reason = document.getElementById("report-reason").value;
-        var details = document.getElementById("report-details").value.trim();
-        var btn = document.getElementById("submit-report");
+        let reason = document.getElementById("report-reason").value;
+        let details = document.getElementById("report-details").value.trim();
+        let btn = document.getElementById("submit-report");
         btn.disabled = true;
         api.reportPost(id, {reason: reason + (details ? " — " + details : "")}).then(function(){
           closeModal();

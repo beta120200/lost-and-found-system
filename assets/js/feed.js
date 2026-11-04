@@ -1,18 +1,13 @@
-/* ---------------------------------------------------------
-   Feed page (Section 11 flowchart) — composer, the paginated feed
-   itself, and the "Still Not Found" sidebar. Loaded after api.js,
-   common.js, modals.js, and realtime.js.
---------------------------------------------------------- */
 window.CURRENT_PAGE = "feed";
 
-var FEED_PAGE_SIZE = 4;
-var feedOffset = 0;
-var feedHasMore = true;
-var feedObserver = null;
-var feedLoadingMore = false;
+let FEED_PAGE_SIZE = 4;
+let feedOffset = 0;
+let feedHasMore = true;
+let feedObserver = null;
+let feedLoadingMore = false;
 
   function renderFeed(){
-    var main = document.getElementById("main");
+    let main = document.getElementById("main");
     main.innerHTML =
       '<div class="feed-layout">' +
         '<div class="feed-main">' +
@@ -30,7 +25,7 @@ var feedLoadingMore = false;
         '<aside class="feed-sidebar" id="feed-sidebar"></aside>' +
       '</div>';
 
-    var mSearch = document.getElementById("mobile-feed-search");
+    let mSearch = document.getElementById("mobile-feed-search");
     if(mSearch){
       mSearch.addEventListener("input", function(e){
         feedSearch = e.target.value;
@@ -44,10 +39,10 @@ var feedLoadingMore = false;
   }
 
   function renderComposerCard(){
-    var box = document.getElementById("composer-card");
+    let box = document.getElementById("composer-card");
     if(!box) return;
-    var u = currentUser();
-    var firstName = u.name.split(" ")[0];
+    let u = currentUser();
+    let firstName = u.name.split(" ")[0];
     box.innerHTML =
       '<div class="composer-card">' +
         '<div class="composer-row">' +
@@ -65,9 +60,8 @@ var feedLoadingMore = false;
     document.getElementById("composer-found").addEventListener("click", function(){ window.location.href = "create-post.html?type=found"; });
   }
 
-  /* Resets pagination and shows the first page — called on load, filter, or search change */
   function renderFeedGrid(){
-    var grid = document.getElementById("feed-grid");
+    let grid = document.getElementById("feed-grid");
     if(!grid) return;
 
     if(feedObserver){ feedObserver.disconnect(); feedObserver = null; }
@@ -82,9 +76,8 @@ var feedLoadingMore = false;
     appendFeedBatch();
   }
 
-  /* Fetches the next page from the server and appends it, feed-style */
   function appendFeedBatch(){
-    var wrap = document.getElementById("feed-wrap");
+    let wrap = document.getElementById("feed-wrap");
     if(!wrap || !feedHasMore) return;
 
     showFeedStatus("Loading…", true);
@@ -95,7 +88,7 @@ var feedLoadingMore = false;
       offset: feedOffset,
       limit: FEED_PAGE_SIZE
     }).then(function(res){
-      var posts = res.posts || [];
+      let posts = res.posts || [];
 
       if(feedOffset === 0 && posts.length === 0){
         grid_setEmptyState();
@@ -104,7 +97,7 @@ var feedLoadingMore = false;
 
       wrap.insertAdjacentHTML("beforeend", posts.map(renderFeedCard).join(""));
       posts.forEach(function(p){
-        var card = wrap.querySelector('.feed-card[data-id="'+p.id+'"]');
+        let card = wrap.querySelector('.feed-card[data-id="'+p.id+'"]');
         if(card) card.addEventListener("click", function(){ window.location.href = "post-details.html?id=" + p.id; });
       });
 
@@ -130,7 +123,7 @@ var feedLoadingMore = false;
   }
 
   function grid_setEmptyState(){
-    var grid = document.getElementById("feed-grid");
+    let grid = document.getElementById("feed-grid");
     if(grid) grid.innerHTML = '<div class="empty-state"><h3>No matching reports</h3><p>Try a different filter or search term, or be the first to report something.</p></div>';
   }
 
@@ -145,14 +138,14 @@ var feedLoadingMore = false;
   }
 
   function showFeedStatus(text, isLoading){
-    var el = document.getElementById("feed-status");
+    let el = document.getElementById("feed-status");
     if(!el) return;
     el.textContent = text;
     el.classList.remove("hidden");
     el.classList.toggle("loading", !!isLoading);
   }
   function hideFeedStatus(){
-    var el = document.getElementById("feed-status");
+    let el = document.getElementById("feed-status");
     if(el) el.classList.add("hidden");
   }
 
@@ -177,13 +170,9 @@ var feedLoadingMore = false;
     );
   }
 
-  /* ---------------------------------------------------------
-     Sidebar — "Still Not Found": oldest open reports, top 20,
-     collapsed to the first 5 by default
-  --------------------------------------------------------- */
-  var STALE_COLLAPSED = 5;
-  var sidebarExpanded = false;
-  var sidebarStaleList = [];
+  let STALE_COLLAPSED = 5;
+  let sidebarExpanded = false;
+  let sidebarStaleList = [];
 
   function loadSidebar(){
     sidebarExpanded = false;
@@ -197,10 +186,10 @@ var feedLoadingMore = false;
   }
 
   function renderSidebar(){
-    var box = document.getElementById("feed-sidebar");
+    let box = document.getElementById("feed-sidebar");
     if(!box) return;
 
-    var head =
+    let head =
       '<div class="sidebar-head">'+icon("clock","sidebar-head-icon")+'<h3>Still Not Found</h3></div>' +
       '<p class="sidebar-sub">Open for a month or more — the longest-waiting reports on the board.</p>';
 
@@ -209,11 +198,11 @@ var feedLoadingMore = false;
       return;
     }
 
-    var visibleCount = sidebarExpanded ? sidebarStaleList.length : Math.min(STALE_COLLAPSED, sidebarStaleList.length);
-    var visible = sidebarStaleList.slice(0, visibleCount);
-    var list = '<div class="sidebar-list">' + visible.map(renderSidebarItem).join("") + '</div>';
+    let visibleCount = sidebarExpanded ? sidebarStaleList.length : Math.min(STALE_COLLAPSED, sidebarStaleList.length);
+    let visible = sidebarStaleList.slice(0, visibleCount);
+    let list = '<div class="sidebar-list">' + visible.map(renderSidebarItem).join("") + '</div>';
 
-    var toggle = "";
+    let toggle = "";
     if(sidebarStaleList.length > STALE_COLLAPSED){
       toggle = sidebarExpanded
         ? '<button class="sidebar-toggle" id="sidebar-toggle">Show less</button>'
@@ -223,10 +212,10 @@ var feedLoadingMore = false;
     box.innerHTML = head + list + toggle;
 
     box.querySelectorAll(".sidebar-item").forEach(function(item){
-      var p = sidebarStaleList.filter(function(x){ return String(x.id) === item.getAttribute("data-id"); })[0];
+      let p = sidebarStaleList.filter(function(x){ return String(x.id) === item.getAttribute("data-id"); })[0];
       if(p) item.addEventListener("click", function(){ window.location.href = "post-details.html?id=" + p.id; });
     });
-    var toggleBtn = document.getElementById("sidebar-toggle");
+    let toggleBtn = document.getElementById("sidebar-toggle");
     if(toggleBtn){
       toggleBtn.addEventListener("click", function(){
         sidebarExpanded = !sidebarExpanded;
@@ -248,9 +237,6 @@ var feedLoadingMore = false;
     );
   }
 
-/* ---------------------------------------------------------
-   Page bootstrap
---------------------------------------------------------- */
 requireSession(["user"]).then(function(){
   renderHeader("feed");
   renderFeed();
@@ -263,9 +249,6 @@ requireSession(["user"]).then(function(){
     renderFeedGrid();
   };
   window.onRealtimeEvent = function(event){
-    // A post was created/edited/removed/resolved anywhere — refresh
-    // both the feed and the sidebar so everyone sees it without a
-    // manual reload. Reports don't affect this page, so ignored here.
     if(event === "posts_changed"){
       renderFeedGrid();
       loadSidebar();

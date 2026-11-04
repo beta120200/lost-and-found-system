@@ -1,25 +1,17 @@
-/* ---------------------------------------------------------
-   Create Post page (Section 11 flowchart / Section 6). Also handles
-   editing via ?edit=<id> — the doc only lists "Create Post" as a page,
-   but reusing this same form for edits (rather than inventing a
-   second near-identical page) is the more sensible read of that,
-   and it's exactly the field set Section 11's "Enter Item Details"
-   step describes either way.
---------------------------------------------------------- */
 window.CURRENT_PAGE = null;
 
 function toggleFieldError(fieldId, isInvalid){
-  var el = document.getElementById(fieldId);
+  let el = document.getElementById(fieldId);
   if(el) el.classList.toggle("invalid", !!isInvalid);
 }
 
 function renderForm(editing, presetType){
-  var main = document.getElementById("main");
-  var selectedIcon = editing ? (editing.icon || ICONS[0]) : ICONS[0];
-  var selectedFile = null;
-  var backHref = editing ? "my-posts.html" : "feed.html";
+  let main = document.getElementById("main");
+  let selectedIcon = editing ? (editing.icon || ICONS[0]) : ICONS[0];
+  let selectedFile = null;
+  let backHref = editing ? "my-posts.html" : "feed.html";
 
-  var photoField = editing ? "" :
+  let photoField = editing ? "" :
     '<div class="field">' +
       '<label>Photo (optional)</label>' +
       '<input type="file" accept="image/*" id="pf-image">' +
@@ -48,7 +40,7 @@ function renderForm(editing, presetType){
       '<div class="page-card-actions"><a class="btn ghost" href="'+backHref+'">Cancel</a><button class="btn" id="pf-submit">'+(editing?"Save Changes":"Create Post")+'</button></div>' +
     '</div>';
 
-  var type = editing ? editing.type : (presetType || "lost");
+  let type = editing ? editing.type : (presetType || "lost");
   function paintType(){
     document.getElementById("type-lost").classList.toggle("selected", type==="lost");
     document.getElementById("type-found").classList.toggle("selected", type==="found");
@@ -57,7 +49,7 @@ function renderForm(editing, presetType){
   document.getElementById("type-lost").addEventListener("click", function(){ type="lost"; paintType(); });
   document.getElementById("type-found").addEventListener("click", function(){ type="found"; paintType(); });
 
-  var iconPicker = document.getElementById("icon-picker");
+  let iconPicker = document.getElementById("icon-picker");
   function paintIcons(){
     iconPicker.querySelectorAll(".icon-opt").forEach(function(btn){
       btn.classList.toggle("selected", btn.getAttribute("data-icon") === selectedIcon);
@@ -68,7 +60,7 @@ function renderForm(editing, presetType){
     btn.addEventListener("click", function(){ selectedIcon = btn.getAttribute("data-icon"); paintIcons(); });
   });
 
-  var fileInput = document.getElementById("pf-image");
+  let fileInput = document.getElementById("pf-image");
   if(fileInput){
     fileInput.addEventListener("change", function(){
       selectedFile = fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
@@ -76,19 +68,19 @@ function renderForm(editing, presetType){
   }
 
   document.getElementById("pf-submit").addEventListener("click", function(){
-    var name = document.getElementById("pf-name").value.trim();
-    var desc = document.getElementById("pf-desc").value.trim();
-    var loc = document.getElementById("pf-loc").value.trim();
-    var date = document.getElementById("pf-date").value;
+    let name = document.getElementById("pf-name").value.trim();
+    let desc = document.getElementById("pf-desc").value.trim();
+    let loc = document.getElementById("pf-loc").value.trim();
+    let date = document.getElementById("pf-date").value;
 
-    var valid = true;
+    let valid = true;
     toggleFieldError("field-name", !name); if(!name) valid=false;
     toggleFieldError("field-desc", !desc); if(!desc) valid=false;
     toggleFieldError("field-loc", !loc); if(!loc) valid=false;
     toggleFieldError("field-date", !date); if(!date) valid=false;
     if(!valid){ toast("Please fix the highlighted fields."); return; }
 
-    var submitBtn = document.getElementById("pf-submit");
+    let submitBtn = document.getElementById("pf-submit");
     submitBtn.disabled = true;
 
     if(editing){
@@ -103,7 +95,7 @@ function renderForm(editing, presetType){
         errToast(err);
       });
     } else {
-      var fd = new FormData();
+      let fd = new FormData();
       fd.append("type", type);
       fd.append("item_name", name);
       fd.append("description", desc);
@@ -123,13 +115,10 @@ function renderForm(editing, presetType){
   });
 }
 
-/* ---------------------------------------------------------
-   Page bootstrap
---------------------------------------------------------- */
 requireSession(["user"]).then(function(u){
   renderHeader(null);
-  var editId = getQueryParam("edit");
-  var presetType = getQueryParam("type");
+  let editId = getQueryParam("edit");
+  let presetType = getQueryParam("type");
 
   if(editId){
     api.getPost(editId).then(function(res){

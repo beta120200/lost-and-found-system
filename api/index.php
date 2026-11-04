@@ -1,12 +1,4 @@
 <?php
-/**
- * Front controller for the Lost and Found REST API (Section 14).
- *
- * Every request to /api/* is rewritten here by .htaccess. This file
- * figures out which route was requested and calls the matching
- * controller function. No framework — a small router is enough for
- * the handful of documented endpoints (Section 4: plain PHP).
- */
 
 require __DIR__ . '/config/db.php';
 require __DIR__ . '/config/imgbb.php';

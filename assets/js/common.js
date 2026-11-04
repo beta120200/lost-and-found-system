@@ -1,24 +1,24 @@
 /* ---------------------------------------------------------
    Small shared helpers / session cache
 --------------------------------------------------------- */
-var ICONS = ["💳","🔑","⌚","💾","🎒","🎧","📘","🧴","🧥","📱","☂️","👓","🏷️"];
+let ICONS = ["💳","🔑","⌚","💾","🎒","🎧","📘","🧴","🧥","📱","☂️","👓","🏷️"];
 
-var sessionUser = null;       // {id, name, email, role, status} or null
-var pendingReportsCount = 0;  // cached for the admin bell badge
-var feedFilter = "all";       // read by common.js's header filter UI; feed.js owns the actual feed
-var feedSearch = "";
+let sessionUser = null;       // {id, name, email, role, status} or null
+let pendingReportsCount = 0;  // cached for the admin bell badge
+let feedFilter = "all";       // read by common.js's header filter UI; feed.js owns the actual feed
+let feedSearch = "";
 
 function currentUser(){ return sessionUser; }
 
 function initials(name){
-  var parts = name.trim().split(/\s+/);
-  var s = parts[0] ? parts[0][0] : "";
+  let parts = name.trim().split(/\s+/);
+  let s = parts[0] ? parts[0][0] : "";
   if(parts.length>1) s += parts[parts.length-1][0];
   return s.toUpperCase();
 }
 
 function fmtDate(isoDate){
-  var d = new Date(isoDate + "T00:00:00");
+  let d = new Date(isoDate + "T00:00:00");
   if(isNaN(d.getTime())) return isoDate;
   return d.toLocaleDateString(undefined, {month:"short", day:"numeric", year:"numeric"});
 }
@@ -46,8 +46,8 @@ function postThumb(p){
    Toasts
 --------------------------------------------------------- */
 function toast(msg){
-  var root = document.getElementById("toast-root");
-  var el = document.createElement("div");
+  let root = document.getElementById("toast-root");
+  let el = document.createElement("div");
   el.className = "toast";
   el.textContent = msg;
   root.appendChild(el);
@@ -62,14 +62,11 @@ function errToast(err){
   toast(err && err.message ? err.message : "Something went wrong.");
 }
 
-/* ---------------------------------------------------------
-   Modal helpers
---------------------------------------------------------- */
 function openModal(html, onMount){
-  var root = document.getElementById("modal-root");
+  let root = document.getElementById("modal-root");
   root.innerHTML =
     '<div class="modal-backdrop" id="modal-backdrop"><div class="modal" role="dialog" aria-modal="true">' + html + '</div></div>';
-  var backdrop = document.getElementById("modal-backdrop");
+  let backdrop = document.getElementById("modal-backdrop");
   backdrop.addEventListener("click", function(e){
     if(e.target === backdrop) closeModal();
   });
@@ -84,18 +81,11 @@ function closeModal(){
   document.removeEventListener("keydown", escCloser);
 }
 function bindModalCommon(){
-  var closeBtn = document.querySelector('[data-action="close-modal"]');
+  let closeBtn = document.querySelector('[data-action="close-modal"]');
   if(closeBtn) closeBtn.addEventListener("click", closeModal);
 }
 
-/* ---------------------------------------------------------
-   Header — Facebook-style dark top bar.
-   Each page calls renderHeader("feed" | "myposts" | "admin" | null)
-   with its own name, instead of the old single-page router deciding it.
-   Nav items are real <a href> links now — full page loads, not a
-   client-side route switch — so the back button and bookmarks work.
---------------------------------------------------------- */
-var ICON_PATHS = {
+let ICON_PATHS = {
   home: '<path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-9"/><path d="M9.5 20v-6h5v6"/>',
   ticket: '<path d="M4 8a1.5 1.5 0 0 1 1.5-1.5h13A1.5 1.5 0 0 1 20 8v2a1.8 1.8 0 0 0 0 4v2a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 16v-2a1.8 1.8 0 0 0 0-4Z"/><path d="M13 6.5v2M13 11v2M13 15.5v2"/>',
   dashboard: '<rect x="3" y="3" width="7.5" height="9" rx="1.2"/><rect x="13.5" y="3" width="7.5" height="5" rx="1.2"/><rect x="13.5" y="10" width="7.5" height="11" rx="1.2"/><rect x="3" y="14" width="7.5" height="7" rx="1.2"/>',
@@ -107,12 +97,11 @@ function icon(name, extraClass){
   return '<svg class="'+(extraClass||"")+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+ICON_PATHS[name]+'</svg>';
 }
 
-var headerDropdownOpen = false;
+let headerDropdownOpen = false;
 
-/** activePage: "feed" | "myposts" | "admin" | null — which nav icon to highlight. */
 function renderHeader(activePage){
-  var wrap = document.getElementById("header-inner");
-  var u = currentUser();
+  let wrap = document.getElementById("header-inner");
+  let u = currentUser();
 
   if(!u){
     wrap.innerHTML =
@@ -121,9 +110,9 @@ function renderHeader(activePage){
     return;
   }
 
-  var homeHref = u.role === "admin" ? "admin.html" : "feed.html";
-  var showFeedControls = (u.role !== "admin") && (activePage === "feed");
-  var left =
+  let homeHref = u.role === "admin" ? "admin.html" : "feed.html";
+  let showFeedControls = (u.role !== "admin") && (activePage === "feed");
+  let left =
     '<div class="fb-left">' +
       '<a href="'+homeHref+'" class="brand-mark" title="Lost & Found Board"><img src="./assets/img/logo.svg" alt="LF Logo"></a>' +
       (u.role !== "admin" ?
@@ -138,7 +127,7 @@ function renderHeader(activePage){
         : '') +
     '</div>';
 
-  var center = '<div class="fb-center">';
+  let center = '<div class="fb-center">';
   if(u.role === "admin"){
     center += '<a href="admin.html" class="fb-icon-btn '+(activePage==="admin"?"active":"")+'" title="Dashboard">'+icon("dashboard")+'</a>';
   } else {
@@ -147,8 +136,8 @@ function renderHeader(activePage){
   }
   center += '</div>';
 
-  var bellBadge = u.role === "admin" ? pendingReportsCount : 0;
-  var right =
+  let bellBadge = u.role === "admin" ? pendingReportsCount : 0;
+  let right =
     '<div class="fb-right">' +
       '<button class="fb-round-btn" id="header-bell" title="Notifications">'+icon("bell")+(bellBadge>0?'<span class="fb-badge">'+bellBadge+'</span>':'')+'</button>' +
       '<div class="fb-avatar-wrap">' +
@@ -164,21 +153,21 @@ function renderHeader(activePage){
 
   wrap.innerHTML = left + center + right;
 
-  var search = document.getElementById("header-search");
+  let search = document.getElementById("header-search");
   if(search){
     search.addEventListener("input", function(e){
       feedSearch = e.target.value;
       if(window.onHeaderSearchChange) window.onHeaderSearchChange();
     });
   }
-  var bell = document.getElementById("header-bell");
+  let bell = document.getElementById("header-bell");
   if(bell){
     bell.addEventListener("click", function(){
       if(u.role === "admin" && window.focusReportsTab){ window.focusReportsTab(); }
       else if(u.role !== "admin"){ toast("You're all caught up — no new notifications."); }
     });
   }
-  var avatarBtn = document.getElementById("header-avatar-btn");
+  let avatarBtn = document.getElementById("header-avatar-btn");
   if(avatarBtn){
     avatarBtn.addEventListener("click", function(e){
       e.stopPropagation();
@@ -195,14 +184,8 @@ document.addEventListener("click", function(e){
   }
 });
 
-/* ---------------------------------------------------------
-   Global event delegation shared by every page: logout, closing a
-   modal, the header's Lost/Found filter pills, and the "+ New Post"
-   buttons (feed.html's composer quick-actions, my-posts.html's header
-   button). Harmless no-ops on pages that don't have these elements.
---------------------------------------------------------- */
 document.addEventListener("click", function(e){
-  var headerFilterBtn = e.target.closest("[data-headerfilter]");
+  let headerFilterBtn = e.target.closest("[data-headerfilter]");
   if(headerFilterBtn){
     feedFilter = headerFilterBtn.getAttribute("data-headerfilter");
     renderHeader(window.CURRENT_PAGE || null);
@@ -210,13 +193,13 @@ document.addEventListener("click", function(e){
     return;
   }
 
-  var newPostBtn = e.target.closest('[data-action="new-post"]');
+  let newPostBtn = e.target.closest('[data-action="new-post"]');
   if(newPostBtn){ window.location.href = "create-post.html"; return; }
 
-  var logoutBtn = e.target.closest('[data-action="logout"]');
+  let logoutBtn = e.target.closest('[data-action="logout"]');
   if(logoutBtn){ handleLogout(); return; }
 
-  var closeBtn = e.target.closest('[data-action="close-modal"]');
+  let closeBtn = e.target.closest('[data-action="close-modal"]');
   if(closeBtn){ closeModal(); return; }
 });
 

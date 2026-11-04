@@ -1,15 +1,4 @@
 <?php
-/**
- * Demo data seeder. Open this file once in your browser
- * (e.g. http://localhost/lost-and-found-system/api/seed.php) after
- * importing database/schema.sql. It creates three demo accounts and a
- * batch of demo posts — some recent, some aged 30+ days so the "Still
- * Not Found" sidebar has something to show immediately.
- *
- * Safe to run only once: it checks whether users already exist and
- * refuses to run again if so, so you won't get duplicate demo data.
- */
-
 require __DIR__ . '/config/db.php';
 
 header('Content-Type: text/plain; charset=utf-8');
@@ -32,22 +21,19 @@ function days_ago_date(int $days): string {
 
 $db->beginTransaction();
 try {
-    // ---- Demo accounts -------------------------------------------------
     $insertUser = $db->prepare(
         'INSERT INTO users (name, email, password_hash, role, status) VALUES (?, ?, ?, ?, "active")'
     );
 
-    $insertUser->execute(['Maria Santos', 'maria@icct.edu.ph', password_hash('password123', PASSWORD_DEFAULT), 'user']);
+    $insertUser->execute(['Maria Santos', 'maria@icct.edu.ph', password_hash('@passworD123', PASSWORD_DEFAULT), 'user']);
     $mariaId = (int) $db->lastInsertId();
 
-    $insertUser->execute(['Jake Rivera', 'jake@icct.edu.ph', password_hash('password123', PASSWORD_DEFAULT), 'user']);
+    $insertUser->execute(['Jake Rivera', 'jake@icct.edu.ph', password_hash('@passworD123', PASSWORD_DEFAULT), 'user']);
     $jakeId = (int) $db->lastInsertId();
 
-    $insertUser->execute(['Ms. Cruz', 'admin@icct.edu.ph', password_hash('admin123', PASSWORD_DEFAULT), 'admin']);
+    $insertUser->execute(['Francisco Ocsan', 'admin@icct.edu.ph', password_hash('@admiN123', PASSWORD_DEFAULT), 'admin']);
     $adminId = (int) $db->lastInsertId();
 
-    // ---- Demo posts ------------------------------------------------------
-    // [ownerId, type, item_name, description, location, icon, daysAgo]
     $posts = [
         [$mariaId, 'lost',  'Black Leather Wallet', 'Bi-fold wallet, contains a student ID and a couple of cards. Last had it at the counter.', 'Canteen, 2nd Floor', '💳', 9],
         [$jakeId,  'found', 'Keys with Blue Lanyard', 'Small bunch of keys, one looks like a padlock key, on a blue lanyard.', 'Gymnasium Entrance', '🔑', 6],
@@ -57,7 +43,7 @@ try {
         [$jakeId,  'found', 'Wired Earphones', 'White wired earphones, tangled, found tucked under a chair.', 'Lecture Hall B', '🎧', 4],
         [$mariaId, 'lost',  'Chemistry Textbook', 'General Chemistry textbook, name written inside the front cover.', 'Room 214', '📘', 16],
         [$jakeId,  'found', 'Green Water Bottle', 'Stainless steel water bottle, dark green, some stickers on it.', 'Parking Lot', '🧴', 3],
-        // Long-pending (30+ days) — populate the "Still Not Found" sidebar.
+        
         [$mariaId, 'lost',  'Faded Green Umbrella', 'Compact folding umbrella, faded green fabric, bent tip on one rib.', 'Bus Stop Near Gate 2', '☂️', 122],
         [$jakeId,  'lost',  'Old Physics Notebook', 'Spiral notebook full of problem sets, name written on the first page.', 'Room 210', '📘', 114],
         [$mariaId, 'found', 'Small Silver Stud Earring', 'Single silver stud earring, found near the sinks.', 'Library Restroom', '💠', 106],

@@ -1,20 +1,5 @@
 <?php
 
-/**
- * Posts controller.
- *
- * posts_index()   GET    /api/posts            feed list (filter/search/paginate)
- *                                               and ?stale=1 for the "Still Not
- *                                               Found" sidebar (Section 12.1 style
- *                                               long-pending list)
- * posts_show()    GET    /api/posts/:id         single post detail
- * posts_store()   POST   /api/posts             create (Section 11 flowchart)
- * posts_update()  PUT    /api/posts/:id         edit (owner or admin)
- * posts_destroy() DELETE /api/posts/:id         delete (owner or admin)
- * posts_report()  POST   /api/posts/:id/report  file a report
- * posts_resolve() PATCH  /api/posts/:id/resolve resolve + delete (Section 13 flowchart)
- */
-
 function post_row_for_output(array $row): array
 {
     return [
@@ -37,8 +22,6 @@ function post_row_for_output(array $row): array
 function posts_index(): void
 {
     $db = get_db();
-
-    // "Still Not Found" sidebar: oldest pending posts, 30+ days old, capped at 20.
     if (isset($_GET['stale']) && $_GET['stale'] === '1') {
         $limit = (int) ($_GET['limit'] ?? 20);
         $limit = max(1, min(20, $limit));
@@ -55,8 +38,6 @@ function posts_index(): void
         json_ok(['posts' => array_map('post_row_for_output', $stmt->fetchAll())]);
     }
 
-    // Regular feed: filter by type, search text, paginate with offset/limit.
-    // ?mine=1 restricts to the logged-in user's own posts (used by "My Posts").
     $type = $_GET['type'] ?? 'all';
     $search = trim($_GET['search'] ?? '');
     $offset = max(0, (int) ($_GET['offset'] ?? 0));
@@ -76,11 +57,6 @@ function posts_index(): void
         $params[':type'] = $type;
     }
     if ($search !== '') {
-        // Three distinct placeholders, not the same :search three times —
-        // MySQL's native prepared statements (PDO::ATTR_EMULATE_PREPARES
-        // false, see config/db.php) don't allow reusing one named
-        // parameter more than once in a query. Reusing it threw
-        // "SQLSTATE[HY093]: Invalid parameter number" on every search.
         $where[] = '(p.item_name LIKE :search1 OR p.description LIKE :search2 OR p.location LIKE :search3)';
         $searchTerm = '%' . $search . '%';
         $params[':search1'] = $searchTerm;
@@ -119,10 +95,6 @@ function posts_show(int $id): void
 function posts_store(): void
 {
     $user = require_auth();
-
-    // If the whole request exceeds post_max_size, PHP drops $_POST and
-    // $_FILES entirely — which otherwise looks like a bogus "Type must be
-    // lost or found" error.
     if (empty($_POST) && empty($_FILES) && (int) ($_SERVER['CONTENT_LENGTH'] ?? 0) > 0) {
         json_error('The upload is too large for the server (post_max_size is '
             . ini_get('post_max_size') . '). Try a smaller photo.', 413);
@@ -142,8 +114,6 @@ function posts_store(): void
         json_error('Please fill in item name, description, location, and date.', 422);
     }
 
-    // Section 7.2: upload to ImgBB if a photo was attached and a key is
-    // configured; otherwise fall back to the chosen icon (see imgbb.php).
     $imageUrl = null;
     if (isset($_FILES['image']) && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE) {
         if ($_FILES['image']['error'] !== UPLOAD_ERR_OK) {
@@ -155,7 +125,6 @@ function posts_store(): void
         $uploadError = null;
         $imageUrl = upload_to_imgbb($_FILES['image']['tmp_name'], $uploadError, $_FILES['image']['name'] ?? null);
         if ($imageUrl === null && $uploadError !== null) {
-            // Fail loudly instead of silently saving the post without its photo.
             json_error('Photo upload failed. ' . $uploadError, 502);
         }
     }
@@ -264,8 +233,7 @@ function posts_resolve(int $id): void
     if ((int) $post['user_id'] !== (int) $user['id'] && $user['role'] !== 'admin') {
         json_error('Only the post owner can mark it as resolved.', 403);
     }
-
-    // Section 13: only delete once possession has actually been confirmed.
+    
     if (empty($data['confirmed'])) {
         json_ok(['message' => 'Post kept as pending.', 'deleted' => false]);
     }

@@ -1,11 +1,6 @@
 <?php
-/**
- * Auth controller — implements the Login and Role-Based Access flowchart
- * (Section 10) plus the equivalent signup flow. Role is always read from
- * the account itself; the client never gets to choose it.
- */
-
-function auth_signup(): void {
+function auth_signup(): void
+{
     $data = json_body();
     $missing = missing_fields($data, ['name', 'email', 'password']);
     if ($missing) {
@@ -30,7 +25,6 @@ function auth_signup(): void {
         json_error('An account with that email already exists.', 409);
     }
 
-    // New accounts always get the standard "user" role — Section 5.
     $stmt = $db->prepare(
         'INSERT INTO users (name, email, password_hash, role, status) VALUES (?, ?, ?, "user", "active")'
     );
@@ -40,11 +34,16 @@ function auth_signup(): void {
     log_in_user(['id' => $userId, 'role' => 'user']);
 
     json_ok(['user' => [
-        'id' => $userId, 'name' => $name, 'email' => $email, 'role' => 'user', 'status' => 'active',
+        'id' => $userId,
+        'name' => $name,
+        'email' => $email,
+        'role' => 'user',
+        'status' => 'active',
     ]], 201);
 }
 
-function auth_login(): void {
+function auth_login(): void
+{
     $data = json_body();
     $missing = missing_fields($data, ['email', 'password']);
     if ($missing) {
@@ -58,7 +57,6 @@ function auth_login(): void {
     $stmt->execute([$email]);
     $user = $stmt->fetch();
 
-    // Section 10: invalid credentials -> show an error, stay on the login step.
     if (!$user || !password_verify($password, $user['password_hash'])) {
         json_error('Incorrect email or password.', 401);
     }
@@ -69,24 +67,31 @@ function auth_login(): void {
     log_in_user($user);
 
     json_ok(['user' => [
-        'id' => (int) $user['id'], 'name' => $user['name'], 'email' => $user['email'],
-        'role' => $user['role'], 'status' => $user['status'],
+        'id' => (int) $user['id'],
+        'name' => $user['name'],
+        'email' => $user['email'],
+        'role' => $user['role'],
+        'status' => $user['status'],
     ]]);
 }
 
-function auth_logout(): void {
+function auth_logout(): void
+{
     log_out_user();
     json_ok();
 }
 
-/** Lets the frontend restore a session on page load/refresh. */
-function auth_me(): void {
+function auth_me(): void
+{
     $user = current_user();
     if (!$user) {
         json_error('Not logged in.', 401);
     }
     json_ok(['user' => [
-        'id' => (int) $user['id'], 'name' => $user['name'], 'email' => $user['email'],
-        'role' => $user['role'], 'status' => $user['status'],
+        'id' => (int) $user['id'],
+        'name' => $user['name'],
+        'email' => $user['email'],
+        'role' => $user['role'],
+        'status' => $user['status'],
     ]]);
 }

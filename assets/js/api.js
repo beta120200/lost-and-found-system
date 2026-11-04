@@ -1,15 +1,9 @@
-/* ---------------------------------------------------------
-   API client — talks to the PHP backend under /api
-   Loaded first on every page; everything below is plain global
-   functions/vars, the same way the previous single-file app.js
-   worked internally — just split into files now, one per page.
---------------------------------------------------------- */
-var API_BASE = "api"; // relative, so this works under any folder name in htdocs
+let API_BASE = "api";
 
 function buildUrl(path, params){
-  var url = API_BASE + path;
+  let url = API_BASE + path;
   if(params){
-    var qs = Object.keys(params)
+    let qs = Object.keys(params)
       .filter(function(k){ return params[k] !== undefined && params[k] !== null && params[k] !== ""; })
       .map(function(k){ return encodeURIComponent(k) + "=" + encodeURIComponent(params[k]); })
       .join("&");
@@ -18,13 +12,12 @@ function buildUrl(path, params){
   return url;
 }
 
-/** Core request helper. Throws an Error with a user-facing message on failure. */
 function request(method, path, options){
   options = options || {};
-  var fetchOpts = { method: method, credentials: "same-origin" };
+  let fetchOpts = { method: method, credentials: "same-origin" };
 
   if(options.form){
-    fetchOpts.body = options.form; // FormData — browser sets the multipart boundary itself
+    fetchOpts.body = options.form;
   } else if(options.json !== undefined){
     fetchOpts.headers = { "Content-Type": "application/json" };
     fetchOpts.body = JSON.stringify(options.json);
@@ -44,7 +37,7 @@ function request(method, path, options){
     });
 }
 
-var api = {
+let api = {
   me:      function(){ return request("GET", "/auth/me"); },
   signup:  function(d){ return request("POST", "/auth/signup", {json: d}); },
   login:   function(d){ return request("POST", "/auth/login", {json: d}); },

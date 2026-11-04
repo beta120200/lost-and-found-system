@@ -12,8 +12,6 @@
 <body>
   <p style="font-family:sans-serif;padding:40px;color:#666;">Loading…</p>
   <script>
-    // index.html just figures out where you belong and sends you there —
-    // the real pages are login.html, feed.html, my-posts.html, admin.html.
     api.me().then(function (res) {
       window.location.replace(res.user.role === "admin" ? "admin.html" : "feed.html");
     }).catch(function () {
